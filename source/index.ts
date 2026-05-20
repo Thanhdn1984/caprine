@@ -12,6 +12,7 @@ import {
 	MenuItemConstructorOptions,
 	systemPreferences,
 	nativeTheme,
+	powerMonitor,
 } from 'electron';
 import {ipcMain as ipc} from 'electron-better-ipc';
 import {autoUpdater} from 'electron-updater';
@@ -346,6 +347,14 @@ function createMainWindow(): BrowserWindow {
 		if (config.get('flashWindowOnMessage')) {
 			// This is a security in the case where messageCount is not reset by page title update
 			win.flashFrame(false);
+		}
+	});
+
+	powerMonitor.on('resume', async () => {
+		await ensureOnline();
+
+		if (!win.isDestroyed()) {
+			win.webContents.reloadIgnoringCache();
 		}
 	});
 
